@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autonomous Agentic Commerce | Razorpay Buildathon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-surface: #111827;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --bg-card-border: rgba(255, 255, 255, 0.08);
+      --primary: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.35);
+      --accent-rzp: #0c2340;
+      --rzp-blue: #0284c7;
+      --rzp-cyan: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #8b5cf6;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+                        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    header {
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--bg-card-border);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #0284c7, #6366f1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: #fff;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .brand-title h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #60a5fa, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-title p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .tech-tags {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tag {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--bg-card-border);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .tag.highlight {
+      border-color: rgba(99, 102, 241, 0.4);
+      background: rgba(99, 102, 241, 0.15);
+      color: #c7d2fe;
+    }
+
+    /* Agent Top Flow Bar */
+    .agent-pipeline {
+      background: rgba(17, 24, 39, 0.6);
+      border-bottom: 1px solid var(--bg-card-border);
+      padding: 10px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      overflow-x: auto;
+    }
+
+    .agent-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--bg-card-border);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+
+    .agent-pill .indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4b5563;
+      transition: all 0.3s ease;
+    }
+
+    .agent-pill.active {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.15);
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+    }
+
+    .agent-pill.active .indicator {
+      background: #3b82f6;
+      box-shadow: 0 0 10px #60a5fa;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.7; }
+    }
+
+    .pipeline-arrow {
+      color: #4b5563;
+      font-size: 0.8rem;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr 340px;
+      gap: 20px;
+      padding: 20px 32px;
+      max-width: 1700px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Card Panels */
+    .panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .panel-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--bg-card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .panel-body {
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* State Inspector */
+    .state-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 0.8rem;
+    }
+
+    .state-row .label {
+      color: var(--text-muted);
+    }
+
+    .state-row .val {
+      font-family: 'JetBrains Mono', monospace;
+      color: #a5b4fc;
+      font-weight: 500;
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-idle { background: rgba(107, 114, 128, 0.2); color: #9ca3af; }
+    .badge-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+    .badge-paid { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+
+    /* Cart Widget */
+    .cart-box {
+      margin-top: 16px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--bg-card-border);
+      padding: 12px;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+      font-size: 0.82rem;
+    }
+
+    .cart-item:last-child {
+      border-bottom: none;
+    }
+
+    .cart-summary-line {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-weight: 700;
+      color: #60a5fa;
+      font-size: 0.95rem;
+    }
+
+    /* Center Chat Area */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 170px);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .msg {
+      max-width: 82%;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      font-size: 0.92rem;
+      line-height: 1.55;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    }
+
+    .msg.agent {
+      align-self: flex-start;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid var(--bg-card-border);
+      color: var(--text-main);
+      border-bottom-left-radius: 4px;
+    }
+
+    .agent-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .agent-header.orchestrator { color: #a78bfa; }
+    .agent-header.buyer { color: #60a5fa; }
+    .agent-header.checkout { color: #34d399; }
+    .agent-header.upsell { color: #f472b6; }
+
+    /* Razorpay Payment Card within chat */
+    .rzp-card {
+      margin-top: 12px;
+      background: linear-gradient(145deg, #0f172a, #0c2340);
+      border: 1px solid #0284c7;
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .rzp-btn {
+      background: linear-gradient(135deg, #0284c7, #0ea5e9);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      text-align: center;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .rzp-btn:hover {
+      box-shadow: 0 0 16px rgba(2, 132, 199, 0.5);
+      transform: translateY(-1px);
+    }
+
+    /* HITL Prompt Modal / Box */
+    .hitl-alert {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .hitl-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-approve {
+      background: #10b981;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      flex: 1;
+      transition: background 0.2s;
+    }
+
+    .btn-approve:hover { background: #059669; }
+
+    .btn-reject {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      flex: 1;
+      transition: all 0.2s;
+    }
+
+    .btn-reject:hover { background: rgba(239, 68, 68, 0.35); }
+
+    /* Chips Bar */
+    .chips-bar {
+      padding: 10px 18px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      border-top: 1px solid var(--bg-card-border);
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--bg-card-border);
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      white-space: nowrap;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .chip:hover {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: #3b82f6;
+      color: #fff;
+    }
+
+    /* Chat Input */
+    .chat-input-bar {
+      padding: 14px 18px;
+      display: flex;
+      gap: 12px;
+      background: rgba(17, 24, 39, 0.9);
+      border-top: 1px solid var(--bg-card-border);
+    }
+
+    .chat-input-bar input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input-bar input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+    }
+
+    .send-btn {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: #fff;
+      border: none;
+      padding: 0 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+
+    .send-btn:hover {
+      box-shadow: 0 0 16px var(--primary-glow);
+      transform: translateY(-1px);
+    }
+
+    /* Right Panel Tabs */
+    .tab-nav {
+      display: flex;
+      border-bottom: 1px solid var(--bg-card-border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      color: #60a5fa;
+      border-bottom: 2px solid #3b82f6;
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    /* Product Item in Right Panel */
+    .catalog-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+
+    .catalog-item:hover {
+      border-color: rgba(59, 130, 246, 0.4);
+      background: rgba(59, 130, 246, 0.04);
+    }
+
+    .catalog-item-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .catalog-price {
+      color: #34d399;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .catalog-desc {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .catalog-btn {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s;
+    }
+
+    .catalog-btn:hover {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    /* Eval Suite Results */
+    .eval-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .eval-score-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+    }
+
+    .score-metric {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      padding: 4px 0;
+    }
+
+    .score-val {
+      font-weight: 700;
+      color: #34d399;
+    }
+
+    .run-eval-btn {
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+      transition: all 0.2s;
+      width: 100%;
+    }
+
+    .run-eval-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="logo-badge">⚡</div>
+      <div class="brand-title">
+        <h1>Autonomous Agentic Commerce</h1>
+        <p>Razorpay Buildathon • Multi-Agent LangGraph Platform</p>
+      </div>
+    </div>
+    <div class="tech-tags">
+      <span class="tag highlight">LangGraph StateGraph</span>
+      <span class="tag">Groq LLaMA 3.3</span>
+      <span class="tag highlight">Razorpay Payment Links</span>
+      <span class="tag">HITL Interrupt</span>
+      <span class="tag">SQLite Catalog</span>
+    </div>
+  </header>
+
+  <!-- Live Multi-Agent Pipeline Indicator -->
+  <div class="agent-pipeline">
+    <div class="agent-pill active" id="pill-orchestrator">
+      <div class="indicator"></div>
+      <span>🧠 Orchestrator</span>
+    </div>
+    <span class="pipeline-arrow">➔</span>
+    <div class="agent-pill" id="pill-buyer">
+      <div class="indicator"></div>
+      <span>🔍 Buyer Agent</span>
+    </div>
+    <span class="pipeline-arrow">➔</span>
+    <div class="agent-pill" id="pill-upsell">
+      <div class="indicator"></div>
+      <span>✨ Upsell Agent</span>
+    </div>
+    <span class="pipeline-arrow">➔</span>
+    <div class="agent-pill" id="pill-checkout">
+      <div class="indicator"></div>
+      <span>💳 Checkout Agent (HITL)</span>
+    </div>
+  </div>
+
+  <!-- Main Grid -->
+  <main>
+    <!-- Left: State Inspector & Cart -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>Active State Inspector</span>
+        <span class="badge-status badge-idle" id="payment-badge">IDLE</span>
+      </div>
+      <div class="panel-body">
+        <div class="state-row">
+          <span class="label">Session ID:</span>
+          <span class="val" id="state-session">default_session</span>
+        </div>
+        <div class="state-row">
+          <span class="label">Active Node:</span>
+          <span class="val" id="state-agent">orchestrator</span>
+        </div>
+        <div class="state-row">
+          <span class="label">Detected Intent:</span>
+          <span class="val" id="state-intent">unknown</span>
+        </div>
+        <div class="state-row">
+          <span class="label">HITL Pending:</span>
+          <span class="val" id="state-hitl">false</span>
+        </div>
+        <div class="state-row">
+          <span class="label">Upsell Shown:</span>
+          <span class="val" id="state-upsell">false</span>
+        </div>
+
+        <!-- Cart Box -->
+        <div class="cart-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <strong style="font-size:0.85rem;">🛒 Active Cart (<span id="cart-count">0</span> items)</strong>
+            <button onclick="clearCart()" style="background:none; border:none; color:#f87171; font-size:0.75rem; cursor:pointer;">Clear</button>
+          </div>
+          <div id="cart-items-list" style="max-height: 150px; overflow-y:auto;">
+            <p style="font-size:0.76rem; color:var(--text-muted); text-align:center; padding:10px;">Cart is empty</p>
+          </div>
+          <div class="cart-summary-line">
+            <span>Total (incl. GST):</span>
+            <span id="cart-total-val">₹0.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Interactive Multi-Agent Chat -->
+    <div class="panel chat-container">
+      <div class="panel-header">
+        <span>Autonomous Multi-Agent Dialogue</span>
+        <span style="font-size:0.75rem; color:#60a5fa;" id="agent-typing-status">Ready</span>
+      </div>
+
+      <div class="chat-messages" id="chat-messages">
+        <div class="msg agent">
+          <div class="agent-header orchestrator">🧠 Orchestrator Agent</div>
+          Welcome to our Agentic Commerce store! I manage 4 specialized autonomous agents:
+          <ul style="margin: 8px 0 0 16px; font-size:0.85rem; line-height:1.6;">
+            <li><strong>Buyer Agent:</strong> Top-3 ranked catalog search with 1-line justification</li>
+            <li><strong>Upsell Agent:</strong> Recommends complementary add-ons post-cart</li>
+            <li><strong>Checkout Agent:</strong> Cart validation & Razorpay payment link generation with Human-in-the-Loop confirmation</li>
+          </ul>
+          <p style="margin-top:8px;">What are you looking to buy today?</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Chips -->
+      <div class="chips-bar">
+        <button class="chip" onclick="quickSend('Find flagship smartphones')">📱 Find Smartphones</button>
+        <button class="chip" onclick="quickSend('Looking for noise cancelling headphones')">🎧 Search Headphones</button>
+        <button class="chip" onclick="quickSend('Show matching accessories for my phone')">✨ Matching Accessories</button>
+        <button class="chip" onclick="quickSend('Proceed to checkout')">💳 Proceed to Checkout</button>
+        <button class="chip" onclick="quickSend('No thanks, skip upsell')">❌ Decline Upsell</button>
+        <button class="chip" onclick="quickSend('Checkout with 0 items in cart')">⚠️ Test Empty Cart</button>
+      </div>
+
+      <!-- Chat Input -->
+      <div class="chat-input-bar">
+        <input type="text" id="user-input" placeholder="Ask to find products, add accessories, or checkout..." onkeydown="if(event.key==='Enter') sendMessage()">
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <!-- Right: Catalog Explorer & Eval Suite -->
+    <div class="panel">
+      <div class="tab-nav">
+        <button class="tab-btn active" id="tab-catalog-btn" onclick="switchTab('catalog')">Catalog Explorer</button>
+        <button class="tab-btn" id="tab-eval-btn" onclick="switchTab('eval')">Eval Suite (20)</button>
+      </div>
+
+      <div class="panel-body" id="tab-catalog-content">
+        <div id="catalog-list">Loading products...</div>
+      </div>
+
+      <div class="panel-body" id="tab-eval-content" style="display:none;">
+        <div class="eval-box">
+          <p style="font-size:0.82rem; color:var(--text-muted); line-height:1.5;">
+            Automated test harness executing <strong>20 adversarial & edge-case scenarios</strong> scored by an LLM-as-a-judge for correctness, groundedness, tool use, and state integrity.
+          </p>
+          <button class="run-eval-btn" id="run-eval-btn" onclick="runEvalSuite()">⚡ Run 20-Scenario Eval Suite</button>
+
+          <div id="eval-loading" style="display:none; text-align:center; padding:15px; color:#a78bfa; font-size:0.85rem;">
+            Evaluating 20 scenarios... scoring reasoning quality...
+          </div>
+
+          <div id="eval-results" style="display:none;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const sessionId = "session_" + Math.random().toString(36).substring(2, 9);
+    document.getElementById("state-session").innerText = sessionId;
+
+    let currentCart = [];
+
+    async function loadCatalog() {
+      try {
+        const res = await fetch('/products');
+        const data = await res.json();
+        const container = document.getElementById("catalog-list");
+        container.innerHTML = "";
+        data.products.forEach(p => {
+          const div = document.createElement("div");
+          div.className = "catalog-item";
+          div.innerHTML = `
+            <div class="catalog-item-header">
+              <span>${p.name}</span>
+              <span class="catalog-price">₹${p.price.toLocaleString()}</span>
+            </div>
+            <div class="catalog-desc">${p.description}</div>
+            <button class="catalog-btn" onclick="addToCart('${p.id}', '${p.name}', ${p.price}, '${p.category}')">+ Add to Cart</button>
+          `;
+          container.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Error loading catalog:", err);
+      }
+    }
+
+    async function addToCart(id, name, price, category) {
+      try {
+        const res = await fetch('/cart/add', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({session_id: sessionId, product_id: id, quantity: 1})
+        });
+        const data = await res.json();
+        updateCartUI(data.cart, data.totals);
+        appendUserMessage(`Add ${name} to my cart`);
+        appendAgentMessage("orchestrator", `Added **${name}** to your cart! You can continue exploring, view matching accessories, or proceed to checkout.`);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function updateCartUI(cart, totals) {
+      currentCart = cart;
+      const countEl = document.getElementById("cart-count");
+      const listEl = document.getElementById("cart-items-list");
+      const totalEl = document.getElementById("cart-total-val");
+
+      countEl.innerText = totals.item_count || 0;
+      totalEl.innerText = `₹${(totals.total || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+      if (!cart || cart.length === 0) {
+        listEl.innerHTML = `<p style="font-size:0.76rem; color:var(--text-muted); text-align:center; padding:10px;">Cart is empty</p>`;
+        return;
+      }
+
+      listEl.innerHTML = "";
+      cart.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "cart-item";
+        row.innerHTML = `
+          <div>
+            <div style="font-weight:600;">${item.name}</div>
+            <div style="color:var(--text-muted); font-size:0.72rem;">Qty: ${item.quantity} × ₹${item.price.toLocaleString()}</div>
+          </div>
+          <button onclick="removeFromCart('${item.product_id}')" style="background:none; border:none; color:#f87171; cursor:pointer;">✕</button>
+        `;
+        listEl.appendChild(row);
+      });
+    }
+
+    async function removeFromCart(id) {
+      const res = await fetch('/cart/remove', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({session_id: sessionId, product_id: id})
+      });
+      const data = await res.json();
+      updateCartUI(data.cart, data.totals);
+    }
+
+    function clearCart() {
+      currentCart = [];
+      updateCartUI([], {item_count: 0, total: 0});
+    }
+
+    function updatePipeline(agent) {
+      ['orchestrator', 'buyer', 'checkout', 'upsell'].forEach(a => {
+        const pill = document.getElementById(`pill-${a}`);
+        if (pill) {
+          pill.classList.toggle('active', a === agent);
+        }
+      });
+      document.getElementById('state-agent').innerText = agent;
+    }
+
+    function updateStateInspector(data) {
+      if (data.last_agent) updatePipeline(data.last_agent);
+      if (data.intent) document.getElementById('state-intent').innerText = data.intent;
+      document.getElementById('state-hitl').innerText = data.hitl_pending ? 'true' : 'false';
+      
+      const badge = document.getElementById('payment-badge');
+      if (data.payment_status === 'paid' || data.payment_status === 'link_created') {
+        badge.className = 'badge-status badge-paid';
+        badge.innerText = data.payment_status.toUpperCase();
+      } else if (data.hitl_pending || data.payment_status === 'pending_approval') {
+        badge.className = 'badge-status badge-pending';
+        badge.innerText = 'PENDING APPROVAL';
+      } else {
+        badge.className = 'badge-status badge-idle';
+        badge.innerText = 'IDLE';
+      }
+
+      if (data.cart && data.cart_totals) {
+        updateCartUI(data.cart, data.cart_totals);
+      }
+    }
+
+    function appendUserMessage(text) {
+      const chat = document.getElementById("chat-messages");
+      const msg = document.createElement("div");
+      msg.className = "msg user";
+      msg.innerText = text;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function appendAgentMessage(agent, text, hitlPending = false, paymentDetails = null) {
+      const chat = document.getElementById("chat-messages");
+      const msg = document.createElement("div");
+      msg.className = "msg agent";
+
+      let headerClass = agent.toLowerCase();
+      let icon = "🤖";
+      if (agent === "orchestrator") { icon = "🧠"; }
+      else if (agent === "buyer") { icon = "🔍"; }
+      else if (agent === "checkout") { icon = "💳"; }
+      else if (agent === "upsell") { icon = "✨"; }
+
+      let html = `<div class="agent-header ${headerClass}">${icon} ${agent.toUpperCase()} AGENT</div>`;
+      
+      // Basic markdown styling for bullets and bold
+      let formatted = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`(.*?)`/g, '<code style="background:rgba(255,255,255,0.1); padding:2px 4px; border-radius:3px;">$1</code>')
+        .replace(/\n/g, '<br>');
+
+      html += `<div>${formatted}</div>`;
+
+      // If Razorpay payment link was created
+      if (paymentDetails && paymentDetails.payment_url) {
+        html += `
+          <div class="rzp-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; color:#38bdf8;">Razorpay Secure Payment</span>
+              <span style="font-size:0.75rem; color:#9ca3af;">${paymentDetails.order_id}</span>
+            </div>
+            <div style="font-size:0.85rem;">Amount: <strong>₹${paymentDetails.amount.toLocaleString()} INR</strong></div>
+            <a href="${paymentDetails.payment_url}" target="_blank" class="rzp-btn">
+              ⚡ Open Razorpay Payment Link
+            </a>
+          </div>
+        `;
+      }
+
+      // If HITL is pending
+      if (hitlPending) {
+        html += `
+          <div class="hitl-alert">
+            <strong style="color:#f59e0b; font-size:0.85rem;">⚠️ Human Approval Required</strong>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Please confirm you want the autonomous agent to generate this Razorpay transaction.</p>
+            <div class="hitl-actions">
+              <button class="btn-approve" onclick="handleHitlDecision(true)">✓ Confirm Payment</button>
+              <button class="btn-reject" onclick="handleHitlDecision(false)">✕ Cancel</button>
+            </div>
+          </div>
+        `;
+      }
+
+      msg.innerHTML = html;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function handleHitlDecision(approved) {
+      appendUserMessage(approved ? "Yes, confirm payment" : "No, cancel payment");
+      try {
+        const res = await fetch('/chat/approve', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({session_id: sessionId, approved: approved})
+        });
+        const data = await res.json();
+        appendAgentMessage(data.last_agent || "checkout", data.response, false, data.payment_details);
+        updateStateInspector(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById("user-input");
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = "";
+      appendUserMessage(text);
+      document.getElementById("agent-typing-status").innerText = "Agents deliberating...";
+
+      try {
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            message: text,
+            session_id: sessionId,
+            override_cart: currentCart
+          })
+        });
+        const data = await res.json();
+        document.getElementById("agent-typing-status").innerText = "Ready";
+        appendAgentMessage(data.last_agent, data.response, data.hitl_pending, data.payment_details);
+        updateStateInspector(data);
+      } catch (err) {
+        document.getElementById("agent-typing-status").innerText = "Ready";
+        console.error(err);
+      }
+    }
+
+    function quickSend(txt) {
+      document.getElementById("user-input").value = txt;
+      sendMessage();
+    }
+
+    function switchTab(tab) {
+      const catBtn = document.getElementById("tab-catalog-btn");
+      const evalBtn = document.getElementById("tab-eval-btn");
+      const catContent = document.getElementById("tab-catalog-content");
+      const evalContent = document.getElementById("tab-eval-content");
+
+      if (tab === 'catalog') {
+        catBtn.classList.add('active');
+        evalBtn.classList.remove('active');
+        catContent.style.display = 'block';
+        evalContent.style.display = 'none';
+      } else {
+        evalBtn.classList.add('active');
+        catBtn.classList.remove('active');
+        evalContent.style.display = 'block';
+        catContent.style.display = 'none';
+      }
+    }
+
+    async function runEvalSuite() {
+      const btn = document.getElementById("run-eval-btn");
+      const loading = document.getElementById("eval-loading");
+      const resultsDiv = document.getElementById("eval-results");
+
+      btn.disabled = true;
+      loading.style.display = "block";
+      resultsDiv.style.display = "none";
+
+      try {
+        const res = await fetch('/eval/run', {method: 'POST'});
+        const data = await res.json();
+        
+        loading.style.display = "none";
+        btn.disabled = false;
+        resultsDiv.style.display = "block";
+
+        let html = `
+          <div class="eval-score-card" style="border-color:#10b981;">
+            <div style="font-weight:700; color:#34d399; margin-bottom:8px;">Judge Benchmark Score: ${data.overall_score}/100</div>
+            <div class="score-metric"><span>Scenarios Evaluated:</span><span class="score-val">${data.total_scenarios}</span></div>
+            <div class="score-metric"><span>Pass Rate:</span><span class="score-val">${data.pass_rate}%</span></div>
+            <div class="score-metric"><span>Avg LLM Judge Score:</span><span class="score-val">${data.avg_reasoning_score} / 5.0</span></div>
+          </div>
+
+          <div class="eval-score-card">
+            <strong style="font-size:0.82rem; color:#60a5fa;">Per-Agent Quality Metrics:</strong>
+            <div class="score-metric"><span>Buyer Retrieval Precision:</span><span class="score-val">${data.buyer_precision}%</span></div>
+            <div class="score-metric"><span>Buyer Fallback Rate:</span><span class="score-val">${data.buyer_fallback_rate}%</span></div>
+            <div class="score-metric"><span>Checkout Completion:</span><span class="score-val">${data.checkout_completion}%</span></div>
+            <div class="score-metric"><span>Upsell Timing Accuracy:</span><span class="score-val">${data.upsell_timing_accuracy}%</span></div>
+            <div class="score-metric"><span>Orchestrator Routing Accuracy:</span><span class="score-val">${data.routing_accuracy}%</span></div>
+          </div>
+        `;
+
+        resultsDiv.innerHTML = html;
+      } catch (err) {
+        loading.style.display = "none";
+        btn.disabled = false;
+        alert("Eval failed: " + err);
+      }
+    }
+
+    // Initial load
+    loadCatalog();
+  </script>
+</body>
+</html>

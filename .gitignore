@@ -1,0 +1,26 @@
+# Python & Environment
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Local Config & Secrets
+.env
+*.local
+
+# SQLite Database
+*.db
+*.sqlite3
+
+# OS / Editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+.system_generated/

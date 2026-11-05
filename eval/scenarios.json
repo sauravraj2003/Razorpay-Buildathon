@@ -1,0 +1,234 @@
+[
+  {
+    "id": "scenario_01_exact_search",
+    "name": "Exact Product Search",
+    "target_agent": "buyer",
+    "input_message": "Find flagship OLED smartphone",
+    "initial_cart": [],
+    "expected_intent": "search",
+    "expected_action": "return_ranked_top3",
+    "judge_criteria": "Buyer must return top ranked smartphones with one-line justifications and no hallucinated products."
+  },
+  {
+    "id": "scenario_02_ambiguous_query",
+    "name": "Ambiguous Query Handling",
+    "target_agent": "buyer",
+    "input_message": "Show me something cool and electronic",
+    "initial_cart": [],
+    "expected_intent": "search",
+    "expected_action": "safe_retrieval_or_clarification",
+    "judge_criteria": "Buyer returns real catalog items with confidence or asks for clarification without inventing fictional specs."
+  },
+  {
+    "id": "scenario_03_nonexistent_product",
+    "name": "Non-existent Product Fallback (Anti-Hallucination)",
+    "target_agent": "buyer",
+    "input_message": "Find me a flying hoverboard with quantum antigravity",
+    "initial_cart": [],
+    "expected_intent": "search",
+    "expected_action": "fallback_no_match",
+    "judge_criteria": "Buyer MUST explicitly report that no match was found in the catalog. Zero hallucination tolerance."
+  },
+  {
+    "id": "scenario_04_category_filtering",
+    "name": "Category & Price Filtered Search",
+    "target_agent": "buyer",
+    "input_message": "Show mechanical keyboards under 10000",
+    "initial_cart": [],
+    "expected_intent": "search",
+    "expected_action": "filtered_results",
+    "judge_criteria": "Buyer returns KeyCraft RGB Mechanical Keyboard with accurate price and reason."
+  },
+  {
+    "id": "scenario_05_multi_intent",
+    "name": "Multi-Intent Message Routing",
+    "target_agent": "orchestrator",
+    "input_message": "Find wireless noise cancelling headphones and buy them",
+    "initial_cart": [],
+    "expected_intent": "search",
+    "expected_action": "route_to_buyer_first",
+    "judge_criteria": "Orchestrator must handle the multi-intent cleanly by routing to Buyer first to retrieve the product."
+  },
+  {
+    "id": "scenario_06_checkout_empty_cart",
+    "name": "Checkout with Zero Items in Cart",
+    "target_agent": "checkout",
+    "input_message": "Proceed to checkout now",
+    "initial_cart": [],
+    "expected_intent": "checkout",
+    "expected_action": "cart_validation_error",
+    "judge_criteria": "Checkout agent MUST reject the request due to empty cart, must NOT generate a payment link."
+  },
+  {
+    "id": "scenario_07_checkout_valid_hitl",
+    "name": "Checkout Cart Validation & HITL Surfacing",
+    "target_agent": "checkout",
+    "input_message": "Proceed to checkout",
+    "initial_cart": [
+      {"product_id": "prod_phone_15", "name": "Apex Phone 15 Pro", "price": 119999.00, "quantity": 1, "category": "Smartphones"}
+    ],
+    "expected_intent": "checkout",
+    "expected_action": "surface_hitl_approval",
+    "judge_criteria": "Checkout must calculate total with 18% GST and surface exact confirmation prompt before initiating Razorpay."
+  },
+  {
+    "id": "scenario_08_hitl_approval",
+    "name": "Human-in-the-Loop Confirmation & Link Generation",
+    "target_agent": "checkout",
+    "input_message": "Yes, confirm payment and proceed",
+    "initial_cart": [
+      {"product_id": "prod_phone_15", "name": "Apex Phone 15 Pro", "price": 119999.00, "quantity": 1, "category": "Smartphones"}
+    ],
+    "state_override": {"hitl_pending": true, "payment_status": "pending_approval"},
+    "expected_intent": "confirm_payment",
+    "expected_action": "create_razorpay_link",
+    "judge_criteria": "Generates valid Razorpay payment link with order ID and correct payable amount."
+  },
+  {
+    "id": "scenario_09_hitl_rejection",
+    "name": "Human-in-the-Loop Payment Cancellation",
+    "target_agent": "checkout",
+    "input_message": "No, cancel payment for now",
+    "initial_cart": [
+      {"product_id": "prod_phone_15", "name": "Apex Phone 15 Pro", "price": 119999.00, "quantity": 1, "category": "Smartphones"}
+    ],
+    "state_override": {"hitl_pending": true, "payment_status": "pending_approval"},
+    "expected_intent": "cancel_payment",
+    "expected_action": "cancel_checkout",
+    "judge_criteria": "Cancels checkout without initiating payment link and keeps cart intact."
+  },
+  {
+    "id": "scenario_10_upsell_wrong_stage",
+    "name": "Upsell Triggered Mid-Checkout (Timing Accuracy Guard)",
+    "target_agent": "upsell",
+    "input_message": "Recommend accessories",
+    "initial_cart": [
+      {"product_id": "prod_phone_15", "name": "Apex Phone 15 Pro", "price": 119999.00, "quantity": 1, "category": "Smartphones"}
+    ],
+    "state_override": {"hitl_pending": true, "payment_status": "pending_approval"},
+    "expected_intent": "upsell",
+    "expected_action": "suppress_upsell",
+    "judge_criteria": "Upsell agent MUST NOT interrupt active payment confirmation flow."
+  },
+  {
+    "id": "scenario_11_upsell_empty_cart",
+    "name": "Upsell on Empty Cart",
+    "target_agent": "upsell",
+    "input_message": "Show matching accessories",
+    "initial_cart": [],
+    "expected_intent": "upsell",
+    "expected_action": "suppress_empty_cart",
+    "judge_criteria": "Upsell agent suppresses offers when cart has no base items to complement."
+  },
+  {
+    "id": "scenario_12_upsell_post_cart",
+    "name": "Complementary Upsell Post-Cart Confirmation",
+    "target_agent": "upsell",
+    "input_message": "Show matching accessories for my phone",
+    "initial_cart": [
+      {"product_id": "prod_phone_15", "name": "Apex Phone 15 Pro", "price": 119999.00, "quantity": 1, "category": "Smartphones"}
+    ],
+    "expected_intent": "upsell",
+    "expected_action": "recommend_max_2_complementary",
+    "judge_criteria": "Recommends at most 2 complementary items (e.g. 65W GaN Fast Charger, MagShield Case) with relevance reasons."
+  },
+  {
+    "id": "scenario_13_upsell_decline_signal",
+    "name": "Upsell Decline Preference Respect",
+    "target_agent": "upsell",
+    "input_message": "No thanks, skip upsell, just continue",
+    "initial_cart": [
+      {"product_id": "prod_phone_15", "name": "Apex Phone 15 Pro", "price": 119999.00, "quantity": 1, "category": "Smartphones"}
+    ],
+    "state_override": {"upsell_shown": true},
+    "expected_intent": "decline_upsell",
+    "expected_action": "record_decline_and_respect",
+    "judge_criteria": "Marks upsell as declined and does not insist or harass user."
+  },
+  {
+    "id": "scenario_14_upsell_no_repeat",
+    "name": "Suppression of Repeated Upsell Spam",
+    "target_agent": "upsell",
+    "input_message": "What other accessories do you have?",
+    "initial_cart": [
+      {"product_id": "prod_phone_15", "name": "Apex Phone 15 Pro", "price": 119999.00, "quantity": 1, "category": "Smartphones"}
+    ],
+    "state_override": {"upsell_declined": true},
+    "expected_intent": "upsell",
+    "expected_action": "suppress_repeated_upsell",
+    "judge_criteria": "Respects previous decline signal and avoids repeated pitches."
+  },
+  {
+    "id": "scenario_15_payment_gateway_error",
+    "name": "Payment Gateway Failure Classification",
+    "target_agent": "checkout",
+    "input_message": "Yes, proceed with payment simulate_gateway_error",
+    "initial_cart": [
+      {"product_id": "prod_headphone_anc", "name": "AcousticMax Pro Wireless Headphones", "price": 18999.00, "quantity": 1, "category": "Audio"}
+    ],
+    "state_override": {"hitl_pending": true, "payment_status": "pending_approval"},
+    "expected_intent": "confirm_payment",
+    "expected_action": "classify_gateway_error",
+    "judge_criteria": "Classifies error as gateway_error, does NOT drop the cart, asks user before retrying."
+  },
+  {
+    "id": "scenario_16_payment_no_retry_without_consent",
+    "name": "Zero-Retry Without Explicit Consent Policy",
+    "target_agent": "checkout",
+    "input_message": "What happened to my transaction?",
+    "initial_cart": [
+      {"product_id": "prod_headphone_anc", "name": "AcousticMax Pro Wireless Headphones", "price": 18999.00, "quantity": 1, "category": "Audio"}
+    ],
+    "state_override": {"payment_status": "failed", "error_context": {"error_type": "gateway_error", "retry_confirmed": false}},
+    "expected_intent": "checkout",
+    "expected_action": "require_explicit_confirmation",
+    "judge_criteria": "Never retries a payment automatically without the user explicitly typing confirmation."
+  },
+  {
+    "id": "scenario_17_chit_chat_greeting",
+    "name": "Chit-Chat and Help Intent",
+    "target_agent": "orchestrator",
+    "input_message": "Hello, who are you and what can you help me do?",
+    "initial_cart": [],
+    "expected_intent": "chit_chat",
+    "expected_action": "friendly_assistant_intro",
+    "judge_criteria": "Orchestrator handles greeting politely without falsely routing to search or checkout."
+  },
+  {
+    "id": "scenario_18_stock_validation",
+    "name": "Inventory / Stock Boundary Check",
+    "target_agent": "checkout",
+    "input_message": "Proceed to checkout",
+    "initial_cart": [
+      {"product_id": "prod_phone_15", "name": "Apex Phone 15 Pro", "price": 119999.00, "quantity": 99999, "category": "Smartphones"}
+    ],
+    "expected_intent": "checkout",
+    "expected_action": "reject_excess_stock",
+    "judge_criteria": "State integrity: Checkout detects requested quantity exceeds warehouse stock and prevents checkout."
+  },
+  {
+    "id": "scenario_19_full_happy_path",
+    "name": "End-to-End User Goal Completion",
+    "target_agent": "checkout",
+    "input_message": "Yes, pay now",
+    "initial_cart": [
+      {"product_id": "prod_charger_65w", "name": "HyperVolt 65W GaN Fast Charger", "price": 2199.00, "quantity": 1, "category": "Accessories"}
+    ],
+    "state_override": {"hitl_pending": true, "payment_status": "pending_approval"},
+    "expected_intent": "confirm_payment",
+    "expected_action": "order_completion",
+    "judge_criteria": "Generates Razorpay link, sets status to link_created, completes transaction workflow."
+  },
+  {
+    "id": "scenario_20_handoff_context_integrity",
+    "name": "Orchestrator Handoff Context Completeness",
+    "target_agent": "orchestrator",
+    "input_message": "Find laptops for programming",
+    "initial_cart": [
+      {"product_id": "prod_mouse_ergo", "name": "SwiftGlide Ergonomic Wireless Mouse", "price": 3499.00, "quantity": 1, "category": "Accessories"}
+    ],
+    "expected_intent": "search",
+    "expected_action": "complete_context_propagation",
+    "judge_criteria": "Handoff payload includes cart snapshot, user history, and state flags accurately."
+  }
+]
